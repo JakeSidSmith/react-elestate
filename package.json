@@ -32,7 +32,7 @@
   },
   "homepage": "https://github.com/jakesidsmith/react-elestate#readme",
   "dependencies": {
-    "react": "^17.0.1"
+    "react": "16.8 - 17"
   },
   "devDependencies": {
     "@jakesidsmith/tsb": "^0.1.5",
