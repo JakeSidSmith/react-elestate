@@ -8,8 +8,8 @@ interface ElevatedState {
 }
 
 const {
-  useElevate,
   useElevated,
+  useElevate,
   useElevateOnMount,
   useElevateOnUpdate,
   useElevateBeforeUnmount,

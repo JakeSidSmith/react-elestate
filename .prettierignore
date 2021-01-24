@@ -1,5 +1,6 @@
 /dist/*
 /examples/build/*
+/.vscode/*
 **/*.txt
 
 .eslintignore
