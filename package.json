@@ -13,7 +13,8 @@
     "prettier": "prettier --write '**/*'",
     "prettier-check": "prettier --check '**/*'",
     "lint": "eslint '**/*.{ts,tsx,js,jsx}' && npm run prettier-check",
-    "test": "npm run lint"
+    "test": "npm run lint",
+    "prepublishOnly": "npm test && npm run dist"
   },
   "repository": {
     "type": "git",
