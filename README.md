@@ -226,7 +226,7 @@ This is essentially just a wrapper around `useEffect`.
 WARNING: if you have two components that both call `useElevateOnUpdate` to update the same piece of state they will fight for control of that state and get stuck in a loop. Only use this when you are certain that a single component should have control of the state in question. You can still have 2 components that call `useElevateOnUpdate` if they are elevating different state keys.
 
 ```tsx
-const Timer: FunctionComponent = ({ children }: { heroImage: string }) => {
+const Timer: FunctionComponent = ({ children }) => {
   const [time, setTime] = useState(Date.now());
 
   useEffect(() => {
