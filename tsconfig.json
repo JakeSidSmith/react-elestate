@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noUncheckedIndexedAccess": true,
+    "sourceMap": true,
+    "declaration": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "noEmit": true,
+    "target": "ES5",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "jsx": "react",
+    "baseUrl": ".",
+    "paths": {
+      "react-elestate": ["src"]
+    }
+  },
+  "include": ["src", "examples/src"]
+}

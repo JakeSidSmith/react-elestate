@@ -1,0 +1,9 @@
+/dist/*
+/examples/build/*
+**/*.txt
+
+.eslintignore
+.prettierignore
+.gitignore
+.gitattributes
+.npmignore
