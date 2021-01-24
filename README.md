@@ -4,6 +4,8 @@
 
 ## About
 
+A tiny state sharing library (< 3KB), with zero dependencies (if you exclude React), built on top of React's existing hooks, with TypeScript in mind.
+
 This library is intended primarily for use when building apps, not libraries, however, if used correctly, could be utilized for library state management.
 
 Unlike other state management libraries elestate takes a global-second approach. Do not elevate your state unless it _needs_ to be shared between components. You should use local component state wherever needed and only elevate this state when you find that it is needed elsewhere. This allows much faster initial development with only minor changes when you need to elevate some state.
