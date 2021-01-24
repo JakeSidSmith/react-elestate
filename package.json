@@ -2,9 +2,12 @@
   "name": "react-elestate",
   "version": "0.0.0",
   "description": "Elevate your React state for access anywhere",
-  "main": "dist/index.js",
+  "main": "dist/cjs/index.js",
+  "module": "dist/es/index.js",
   "scripts": {
-    "dist": "rm -rf dist && tsc --project tsconfig.dist.json",
+    "dist": "rm -rf dist && npm run dist-cjs && npm run dist-es",
+    "dist-cjs": "tsc --project tsconfig.dist-cjs.json && terser dist/cjs/index.js --output dist/cjs/index.js --compress --mangle --source-map \"content='dist/cjs/index.js.map',filename='index.js.map',url='index.js.map'\"",
+    "dist-es": "tsc --project tsconfig.dist-es.json && terser dist/es/index.js --output dist/es/index.js --compress --mangle --source-map \"content='dist/es/index.js.map',filename='index.js.map',url='index.js.map'\"",
     "start": "tsb serve",
     "build": "tsb build",
     "prettier": "prettier --write '**/*'",
@@ -47,6 +50,7 @@
     "eslint-plugin-react-hooks": "^4.2.0",
     "prettier": "^2.2.1",
     "react-dom": "^17.0.1",
+    "terser": "^5.5.1",
     "typescript": "^4.1.3"
   },
   "peerDependencies": {
