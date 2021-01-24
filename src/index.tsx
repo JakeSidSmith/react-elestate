@@ -19,11 +19,11 @@ export interface ElevationInterface<S extends StringKeyedObject> {
     selector: ElevateSelector<S, R>,
     subscribedKeys?: readonly (keyof S)[]
   ) => R;
-  useElevateInitialState: (initialState: S) => void;
   useElevate: () => (action: ElevateAction<S>) => void;
   useElevateOnMount: (action: ElevateAction<S>) => void;
   useElevateOnUpdate: (action: ElevateAction<S>) => void;
   useElevateBeforeUnmount: (action: ElevateAction<S>) => void;
+  useElevateInitialState: (initialState: S) => void;
 }
 
 const getDiffKeys = <S extends StringKeyedObject>(
@@ -145,18 +145,6 @@ const createElevation = <S extends StringKeyedObject>(
     return selector(state);
   };
 
-  const useElevateInitialState = (initialState: S) => {
-    const fired = React.useRef(false);
-
-    if (!fired.current) {
-      if (initialState) {
-        store.setState(initialState, false);
-      }
-
-      fired.current = true;
-    }
-  };
-
   const useElevate = () => {
     const elevate = React.useCallback((action: ElevateAction<S>): void => {
       store.setState(action);
@@ -188,13 +176,25 @@ const createElevation = <S extends StringKeyedObject>(
     );
   };
 
+  const useElevateInitialState = (initialState: S) => {
+    const fired = React.useRef(false);
+
+    if (!fired.current) {
+      if (initialState) {
+        store.setState(initialState, false);
+      }
+
+      fired.current = true;
+    }
+  };
+
   return {
     useElevated,
-    useElevateInitialState,
     useElevate,
     useElevateOnMount,
     useElevateOnUpdate,
     useElevateBeforeUnmount,
+    useElevateInitialState,
   };
 };
 
