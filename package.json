@@ -1,6 +1,6 @@
 {
   "name": "react-elestate",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Elevate your React state for access anywhere",
   "main": "dist/cjs/index.js",
   "module": "dist/es/index.js",
