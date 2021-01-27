@@ -163,7 +163,8 @@ const createElevation = <S extends StringKeyedObject>(
   const useElevateOnUpdate = (action: ElevateAction<S>): void => {
     React.useEffect(() => {
       store.setState(action);
-    }, [action]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [typeof action === 'function' ? action : Object.values(action)]);
   };
 
   const useElevateBeforeUnmount = (action: ElevateAction<S>): void => {
