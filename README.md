@@ -223,7 +223,7 @@ Will automatically elevate some state when it changes.
 
 This is essentially just a wrapper around `useEffect`.
 
-WARNING: if you have two components that both call `useElevateOnUpdate` to update the same piece of state they will fight for control of that state and get stuck in a loop. Only use this when you are certain that a single component should have control of the state in question. You can still have 2 components that call `useElevateOnUpdate` if they are elevating different state keys.
+WARNING: if you have two components that both call `useElevateOnUpdate` to update the same piece of state they may fight for control of that state and get stuck in a loop if you provide a function instead of an object (as if this relies on the previous state it will always be different). Only use this when you are certain that a single component should have control of the state in question at a time. You can still have 2 components rendered that call `useElevateOnUpdate` if they are elevating different state keys, and you may use `useElevateOnUpdate` in more than one place _if_ you are passing it an object (even if they are elevating the same key). Just be careful,
 
 ```tsx
 const Timer: FunctionComponent = ({ children }) => {
@@ -248,6 +248,6 @@ const Timer: FunctionComponent = ({ children }) => {
 ## Gotchas
 
 - Do not mutate elevated state - mutating state may not cause your components to update.
-- Do not render more than one component using any of the [automated elevation hooks](#automatic-elevation) to update a single piece of state at the same time - they may fight over which controls the state and either only the latter component rendered will win, or they will get stuck in an infinite loop.
+- Avoid rendering more than one component using any of the [automated elevation hooks](#automatic-elevation) to update a single piece of state at the same time - they may fight over which controls the state and either only the latter component rendered will win, or they will get stuck in an infinite loop.
 - Only ever call `useElevateInitialState` once at the very root of your app.
-- Do not call `useElevateInitialState` at all if you just want to provide some default state, this can be provided when [creating your elevation](#createElevation).
+- Avoid calling `useElevateInitialState` if you just want to provide some default state, this can be provided when [creating your elevation](#createElevation).
