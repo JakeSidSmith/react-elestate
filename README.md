@@ -223,7 +223,7 @@ Will automatically elevate some state when it changes.
 
 This is essentially just a wrapper around `useEffect`.
 
-WARNING: if you have two components that both call `useElevateOnUpdate` to update the same piece of state they will fight for control of that state and get stuck in a loop. Only use this when you are certain that a single component should have control of the state in question. You can still have 2 components that call `useElevateOnUpdate` if they are elevating different state keys.
+WARNING: if you have two components that both call `useElevateOnUpdate` to update the same piece of state they may fight for control of that state and get stuck in a loop if you provide a function instead of an object (as if this relies on the previous state it will always be different). Only use this when you are certain that a single component should have control of the state in question at a time. You can still have 2 components rendered that call `useElevateOnUpdate` if they are elevating different state keys, and you may use `useElevateOnUpdate` in more than one place _if_ you are passing it an object (even if they are elevating the same key). Just be careful,
 
 ```tsx
 const Timer: FunctionComponent = ({ children }) => {
