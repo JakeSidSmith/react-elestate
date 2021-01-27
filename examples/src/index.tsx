@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import createElevation from '../../src';
+import createElevation from 'react-elestate';
 
 interface ElevatedState {
   count: number;
