@@ -16,7 +16,8 @@
     "jsx": "react",
     "baseUrl": ".",
     "paths": {
-      "react-elestate": ["src"]
+      "react-elestate": ["src"],
+      "react-elestate/*": ["src/*"]
     }
   },
   "include": ["src", "examples/src"]

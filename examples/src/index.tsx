@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import createElevation from 'react-elestate';
+import * as axiosPlugin from 'react-elestate/plugins/axios-hooks';
 
 interface ElevatedState {
   count: number;
@@ -10,11 +11,16 @@ interface ElevatedState {
 const {
   useElevated,
   useElevate,
+  useElevateState,
   useElevateOnMount,
   useElevateOnUpdate,
   useElevateBeforeUnmount,
   useElevateInitialState,
-} = createElevation<ElevatedState>({ count: 0, header: null });
+  useElevateAxios,
+} = createElevation<ElevatedState, typeof axiosPlugin>(
+  { count: 0, header: null },
+  axiosPlugin
+);
 
 const Counter = () => {
   const count = useElevated((state) => state.count, ['count']);
