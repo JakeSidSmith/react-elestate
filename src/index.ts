@@ -196,10 +196,10 @@ const createElevation = <S extends StringKeyedObject>(
 
     const setState = React.useCallback(
       (action: ElevateStateAction<S[K]>) => {
-        elevate((previousState) => ({
-          ...previousState,
+        elevate((state) => ({
+          ...state,
           [key]: isElevateStateActionFunction(action)
-            ? action(previousState[key])
+            ? action(state[key])
             : action,
         }));
       },
@@ -255,15 +255,15 @@ const createElevation = <S extends StringKeyedObject>(
     ) => AxiosPromise<TResponse>
   ] => {
     const elevate = useElevate();
-    const state = useElevated((currentState) => currentState[key]);
+    const currentState = useElevated((state) => state[key]);
     const fired = React.useRef(false);
 
     const [response, request] = axiosHooksResult;
 
     React.useEffect(() => {
       if (fired.current) {
-        elevate((previousState) => ({
-          ...previousState,
+        elevate((state) => ({
+          ...state,
           [key]: response.data,
         }));
       }
@@ -273,12 +273,12 @@ const createElevation = <S extends StringKeyedObject>(
 
     const memoResponse = React.useMemo(
       () => ({
-        data: state,
+        data: currentState,
         loading: response.loading,
         error: response.error,
         response: response.response,
       }),
-      [state, response.loading, response.error, response.response]
+      [currentState, response.loading, response.error, response.response]
     );
 
     return [memoResponse, request];
