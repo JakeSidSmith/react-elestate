@@ -1,4 +1,6 @@
 import * as React from 'react';
+import type { RefetchOptions, ResponseValues } from 'axios-hooks';
+import type { AxiosPromise, AxiosRequestConfig } from 'axios';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type StringKeyedObject = Record<string, any>;
@@ -31,6 +33,27 @@ export interface ElevationInterface<S extends StringKeyedObject> {
   useElevateOnMount: (action: ElevateAction<S>) => void;
   useElevateOnUpdate: (action: ElevateAction<S>) => void;
   useElevateBeforeUnmount: (action: ElevateAction<S>) => void;
+  useElevateAxios: <
+    K extends keyof S,
+    TResponse extends S[K],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    TError = any
+  >(
+    key: K,
+    axiosHooksResult: [
+      ResponseValues<TResponse, TError>,
+      (
+        config?: AxiosRequestConfig,
+        options?: RefetchOptions
+      ) => AxiosPromise<TResponse>
+    ]
+  ) => [
+    ResponseValues<TResponse, TError>,
+    (
+      config?: AxiosRequestConfig,
+      options?: RefetchOptions
+    ) => AxiosPromise<TResponse>
+  ];
   useElevateInitialState: (initialState: S) => void;
 }
 
@@ -210,6 +233,57 @@ const createElevation = <S extends StringKeyedObject>(
     );
   };
 
+  const useElevateAxios = <
+    K extends keyof S,
+    TResponse extends S[K],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    TError = any
+  >(
+    key: K,
+    axiosHooksResult: [
+      ResponseValues<TResponse, TError>,
+      (
+        config?: AxiosRequestConfig,
+        options?: RefetchOptions
+      ) => AxiosPromise<TResponse>
+    ]
+  ): [
+    ResponseValues<TResponse, TError>,
+    (
+      config?: AxiosRequestConfig,
+      options?: RefetchOptions
+    ) => AxiosPromise<TResponse>
+  ] => {
+    const elevate = useElevate();
+    const state = useElevated((currentState) => currentState[key]);
+    const fired = React.useRef(false);
+
+    const [response, request] = axiosHooksResult;
+
+    React.useEffect(() => {
+      if (fired.current) {
+        elevate((previousState) => ({
+          ...previousState,
+          [key]: response.data,
+        }));
+      }
+
+      fired.current = true;
+    }, [response.data, elevate, key]);
+
+    const memoResponse = React.useMemo(
+      () => ({
+        data: state,
+        loading: response.loading,
+        error: response.error,
+        response: response.response,
+      }),
+      [state, response.loading, response.error, response.response]
+    );
+
+    return [memoResponse, request];
+  };
+
   const useElevateInitialState = (initialState: S) => {
     const fired = React.useRef(false);
 
@@ -229,6 +303,7 @@ const createElevation = <S extends StringKeyedObject>(
     useElevateOnMount,
     useElevateOnUpdate,
     useElevateBeforeUnmount,
+    useElevateAxios,
     useElevateInitialState,
   };
 };
