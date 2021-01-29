@@ -111,6 +111,7 @@ const createElevation = <
   };
 
   const api = {
+    store,
     useElevated,
     useElevate,
     useElevateState,
@@ -125,7 +126,7 @@ const createElevation = <
   >(
     (memo, [name, create]) => ({
       ...memo,
-      [name]: create(store, api),
+      [name]: create(api),
     }),
     {} as ElevateInitializePlugins<S, P>
   );

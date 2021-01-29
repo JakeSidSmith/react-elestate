@@ -25,7 +25,6 @@ export interface ElevateSubscription<S extends ElevateBaseState> {
 export type ElevatePlugin = (...args: readonly any[]) => any;
 
 export type ElevatePluginCreator<S extends ElevateBaseState> = (
-  store: ElevationStore<S>,
   api: ElevateAPI<S>
 ) => ElevatePlugin;
 
@@ -36,6 +35,7 @@ export type ElevateInitializePlugins<S, P extends ElevatePluginCreators<S>> = {
 };
 
 export interface ElevateAPI<S extends ElevateBaseState> {
+  store: ElevationStore<S>;
   useElevated: <R>(
     selector: ElevateSelector<S, R>,
     subscribedKeys?: readonly (keyof S)[]

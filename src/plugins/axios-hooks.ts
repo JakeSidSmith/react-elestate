@@ -2,12 +2,11 @@ import * as React from 'react';
 import type { RefetchOptions, ResponseValues } from 'axios-hooks';
 import type { AxiosPromise, AxiosRequestConfig } from 'axios';
 import type { ElevateAPI, ElevateBaseState } from '../types';
-import type { ElevationStore } from '../store';
 
-const createPlugin = <S extends ElevateBaseState>(
-  _store: ElevationStore<S>,
-  { useElevate, useElevated }: ElevateAPI<S>
-): (<
+const createPlugin = <S extends ElevateBaseState>({
+  useElevate,
+  useElevated,
+}: ElevateAPI<S>): (<
   K extends keyof S,
   TResponse extends S[K],
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
