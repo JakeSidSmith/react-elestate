@@ -3,6 +3,13 @@ import * as React from 'react';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type StringKeyedObject = Record<string, any>;
 
+export type ElevateStateAction<S> = S | ((state: S) => S);
+
+export type ElevateStateInterface<S> = [
+  S,
+  (action: ElevateStateAction<S>) => void
+];
+
 export type ElevateAction<S extends StringKeyedObject> =
   | Partial<S>
   | ((state: S) => Partial<S>);
@@ -20,11 +27,16 @@ export interface ElevationInterface<S extends StringKeyedObject> {
     subscribedKeys?: readonly (keyof S)[]
   ) => R;
   useElevate: () => (action: ElevateAction<S>) => void;
+  useElevateState: <K extends keyof S>(key: K) => ElevateStateInterface<S[K]>;
   useElevateOnMount: (action: ElevateAction<S>) => void;
   useElevateOnUpdate: (action: ElevateAction<S>) => void;
   useElevateBeforeUnmount: (action: ElevateAction<S>) => void;
   useElevateInitialState: (initialState: S) => void;
 }
+
+const isElevateStateActionFunction = <S>(
+  action: ElevateStateAction<S>
+): action is (state: S) => S => typeof action === 'function';
 
 const getDiffKeys = <S extends StringKeyedObject>(
   state: S,
@@ -153,6 +165,27 @@ const createElevation = <S extends StringKeyedObject>(
     return elevate;
   };
 
+  const useElevateState = <K extends keyof S>(
+    key: K
+  ): ElevateStateInterface<S[K]> => {
+    const elevate = useElevate();
+    const currentState = useElevated((state) => state[key], [key]);
+
+    const setState = React.useCallback(
+      (action: ElevateStateAction<S[K]>) => {
+        elevate((previousState) => ({
+          ...previousState,
+          [key]: isElevateStateActionFunction(action)
+            ? action(previousState[key])
+            : action,
+        }));
+      },
+      [elevate, key]
+    );
+
+    return [currentState, setState];
+  };
+
   const useElevateOnMount = (action: ElevateAction<S>): void => {
     React.useEffect(() => {
       store.setState(action);
@@ -192,6 +225,7 @@ const createElevation = <S extends StringKeyedObject>(
   return {
     useElevated,
     useElevate,
+    useElevateState,
     useElevateOnMount,
     useElevateOnUpdate,
     useElevateBeforeUnmount,
