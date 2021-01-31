@@ -54,6 +54,19 @@ const Decrement = () => {
   return <button onClick={onClick}>Decrement {count}</button>;
 };
 
+const CounterControl = () => {
+  const [count, setCount] = useElevateState('count');
+  const onChange = React.useCallback(
+    ({ currentTarget: { value } }: React.ChangeEvent<HTMLInputElement>) => {
+      const nextCount = parseInt(value, 10);
+      setCount(Number.isNaN(nextCount) ? 0 : nextCount);
+    },
+    [setCount]
+  );
+
+  return <input type="number" onChange={onChange} value={count} />;
+};
+
 const Header = () => {
   const title = useElevated((state) => state.header, ['header']);
 
@@ -159,6 +172,7 @@ const App = () => {
       <Counter />
       <Increment />
       <Decrement />
+      <CounterControl />
       <Header />
       <Tabs />
     </>
