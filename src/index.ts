@@ -37,6 +37,11 @@ export type PickStringKeys<S extends StringKeyedObject> = Pick<
   KeysOfType<S, string>
 >;
 
+export type PickNumberKeys<S extends StringKeyedObject> = Pick<
+  S,
+  KeysOfType<S, number>
+>;
+
 export type PickBooleanKeys<S extends StringKeyedObject> = Pick<
   S,
   KeysOfType<S, boolean>
@@ -53,6 +58,17 @@ export interface ElevateFormInterface<S extends StringKeyedObject> {
   ) => (event: React.FormEvent<HTMLFormElement>) => void;
   useElevateFieldValue: <F extends keyof PickStringKeys<S>>(
     fieldName: F
+  ) => {
+    value: string;
+    onChange: (
+      event: React.ChangeEvent<
+        HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+      >
+    ) => void;
+  };
+  useElevateFieldNumberValue: <F extends keyof PickNumberKeys<S>>(
+    fieldName: F,
+    valueWhenNaN: S[F]
   ) => {
     value: string;
     onChange: (
@@ -300,6 +316,47 @@ const createElevation = <S extends StringKeyedObject>(
       return props;
     };
 
+    const useElevateFieldNumberValue = <F extends keyof PickNumberKeys<S[K]>>(
+      fieldName: F,
+      valueWhenNaN: S[K][F]
+    ) => {
+      const elevate = useElevate();
+      const numberValue = useElevated((state) => state[key][fieldName]);
+      const value =
+        (typeof numberValue === 'number'
+          ? numberValue.toString()
+          : numberValue) ?? '';
+
+      const onChange = React.useCallback(
+        (
+          event: React.ChangeEvent<
+            HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+          >
+        ) => {
+          const nextValue = parseFloat(event.currentTarget.value);
+
+          elevate((state) => ({
+            ...state,
+            [key]: {
+              ...state[key],
+              [fieldName]: Number.isNaN(nextValue) ? valueWhenNaN : nextValue,
+            },
+          }));
+        },
+        [fieldName, elevate, valueWhenNaN]
+      );
+
+      const props = React.useMemo(
+        () => ({
+          value,
+          onChange,
+        }),
+        [value, onChange]
+      );
+
+      return props;
+    };
+
     const useElevateFieldChecked = <F extends keyof PickBooleanKeys<S[K]>>(
       fieldName: F
     ) => {
@@ -363,6 +420,7 @@ const createElevation = <S extends StringKeyedObject>(
       useElevateFieldValue,
       useElevateFieldChecked,
       useElevateFieldCustom,
+      useElevateFieldNumberValue,
     };
   };
 

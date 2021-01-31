@@ -10,6 +10,7 @@ interface ElevatedState {
     favoriteColor: string;
     tellingTheTruth: boolean;
     dateString: string;
+    number: number | undefined;
     custom: number | undefined;
   }>;
 }
@@ -32,6 +33,7 @@ const {
 const {
   useOnSubmit,
   useElevateFieldValue,
+  useElevateFieldNumberValue,
   useElevateFieldChecked,
   useElevateFieldCustom,
 } = createElevationForm('favoriteForm');
@@ -209,6 +211,7 @@ const Form = () => {
   const favoriteColor = useElevateFieldValue('favoriteColor');
   const tellingTheTruth = useElevateFieldChecked('tellingTheTruth');
   const dateString = useElevateFieldValue('dateString');
+  const number = useElevateFieldNumberValue('number', undefined);
   const custom = useElevateFieldCustom('custom');
 
   return (
@@ -216,8 +219,9 @@ const Form = () => {
       <input type="text" {...favoriteFood} />
       <input type="text" {...favoriteColor} />
       <input type="checkbox" {...tellingTheTruth} />
-      <CustomInput {...custom} />
       <input type="date" {...dateString} />
+      <input type="number" {...number} />
+      <CustomInput {...custom} />
       <button type="submit">Submit</button>
     </form>
   );
