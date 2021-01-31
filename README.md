@@ -2,6 +2,31 @@
 
 **Elevate your React state for access anywhere**
 
+## Super quick overview
+
+```tsx
+// Create an elevation
+const e = createElevation<StateType>(initialValue);
+// Access a value from the elevation
+e.useElevated((state) => state.value);
+// Elevate a value
+const elevate = e.useElevate();
+elevate({ message: 'Hello, World!' });
+// Elevate a value based on the current value
+elevate((state) => ({ count: state.count + 1 }));
+// Both access and control a piece of the state
+const [value, setValue] = e.useElevateState('message');
+// Elevate a value on mount (can also receive a function)
+e.useElevateOnMount({ count: 0 });
+// Set/clear a value on unmount (can also receive a function)
+e.useElevateBeforeUnmount({ count: null });
+// Continuously elevate a value (can also receive a function)
+const time = useTime();
+e.useElevateOnUpdate({ time });
+// Set initial values for server side rendering (at the top of your App component)
+e.useElevateInitialState({ count: 1 });
+```
+
 ## About
 
 A tiny state sharing library (< 3KB), with zero dependencies (if you exclude React), built on top of React's existing hooks, with TypeScript in mind.
@@ -20,31 +45,6 @@ By default access of elevated state will listen for any changes to the elevated 
 
 ```shell
 npm i react-elestate -P
-```
-
-## Super quick overview
-
-```tsx
-// Create an elevation
-const e = createElevation<StateType>(initialValue);
-// Access a value from the elevation
-e.useElevated((state) => state.value);
-// Elevate a value
-const elevate = e.useElevate();
-elevate({ message: 'Hello, World!' });
-// Elevate a value based on the current value
-elevate((state) => ({ count: state.count + 1 }));
-// Both access and control a piece of the state
-const [value, setValue] = e.useElevateState('message');
-// Elevate a value on mount (can also receive a function)
-e.useElevateOnMount({ count: 0 });
-// Set/clear a value on unmount
-e.useElevateBeforeUnmount({ count: null });
-// Continuously elevate a value
-const time = useTime();
-e.useElevateOnUpdate({ time });
-// Set initial values for server side rendering (at the top of your App component)
-e.useElevateInitialState({ count: 1 });
 ```
 
 ## Usage

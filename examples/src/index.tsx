@@ -5,6 +5,14 @@ import createElevation from 'react-elestate';
 interface ElevatedState {
   count: number;
   header: string | null;
+  favoriteForm: Partial<{
+    favoriteFood: string;
+    favoriteColor: string;
+    tellingTheTruth: boolean;
+    dateString: string;
+    number: number | undefined;
+    custom: number | undefined;
+  }>;
 }
 
 const {
@@ -15,7 +23,20 @@ const {
   useElevateOnUpdate,
   useElevateBeforeUnmount,
   useElevateInitialState,
-} = createElevation<ElevatedState>({ count: 0, header: null });
+  createElevationForm,
+} = createElevation<ElevatedState>({
+  count: 0,
+  header: null,
+  favoriteForm: {},
+});
+
+const {
+  useOnSubmit,
+  useElevateFieldValue,
+  useElevateFieldNumberValue,
+  useElevateFieldChecked,
+  useElevateFieldCustom,
+} = createElevationForm('favoriteForm');
 
 const Counter = () => {
   const count = useElevated((state) => state.count, ['count']);
@@ -159,8 +180,57 @@ const Tabs = () => {
   );
 };
 
+interface CustomInputProps {
+  value: number | undefined;
+  onChange: (value: number | undefined) => void;
+}
+
+const CustomInput = ({ value, onChange }: CustomInputProps) => {
+  const onChangeWrapper = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (event.currentTarget.value) {
+        const int = parseInt(event.currentTarget.value, 10);
+
+        if (Number.isFinite(int)) {
+          onChange(int);
+          return;
+        }
+      }
+
+      onChange(undefined);
+    },
+    [onChange]
+  );
+
+  return <input type="number" value={value ?? ''} onChange={onChangeWrapper} />;
+};
+
+const Form = () => {
+  const onSubmit = useOnSubmit((data) => alert(JSON.stringify(data)));
+  const favoriteFood = useElevateFieldValue('favoriteFood');
+  const favoriteColor = useElevateFieldValue('favoriteColor');
+  const tellingTheTruth = useElevateFieldChecked('tellingTheTruth');
+  const dateString = useElevateFieldValue('dateString');
+  const number = useElevateFieldNumberValue('number', {
+    valueWhenNaN: undefined,
+  });
+  const custom = useElevateFieldCustom('custom');
+
+  return (
+    <form onSubmit={onSubmit}>
+      <input type="text" {...favoriteFood} />
+      <input type="text" {...favoriteColor} />
+      <input type="checkbox" {...tellingTheTruth} />
+      <input type="date" {...dateString} />
+      <input type="number" {...number} />
+      <CustomInput {...custom} />
+      <button type="submit">Submit</button>
+    </form>
+  );
+};
+
 const App = () => {
-  useElevateInitialState({ count: 1, header: null });
+  useElevateInitialState({ count: 1, header: null, favoriteForm: {} });
 
   return (
     <>
@@ -170,6 +240,7 @@ const App = () => {
       <CounterControl />
       <Header />
       <Tabs />
+      <Form />
     </>
   );
 };
