@@ -4,8 +4,6 @@ export * from './types';
 // eslint-disable-next-line no-duplicate-imports
 import type {
   ElevateAction,
-  ElevateInitializePlugins,
-  ElevatePluginCreators,
   ElevateSelector,
   ElevateStateAction,
   ElevateStateInterface,
@@ -14,14 +12,9 @@ import type {
 } from './types';
 import { isElevateStateActionFunction } from './utils';
 
-const createElevation = <
-  S extends ElevateBaseState,
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  P extends ElevatePluginCreators<S> = {}
->(
-  defaultState: S,
-  plugins?: P
-): ElevationInterface<S, P> => {
+const createElevation = <S extends ElevateBaseState>(
+  defaultState: S
+): ElevationInterface<S> => {
   const store = new ElevationStore(defaultState);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -110,7 +103,7 @@ const createElevation = <
     }
   };
 
-  const api = {
+  return {
     store,
     useElevated,
     useElevate,
@@ -119,21 +112,6 @@ const createElevation = <
     useElevateOnUpdate,
     useElevateBeforeUnmount,
     useElevateInitialState,
-  };
-
-  const initializedPlugins = Object.entries(plugins || {}).reduce<
-    ElevateInitializePlugins<S, P>
-  >(
-    (memo, [name, create]) => ({
-      ...memo,
-      [name]: create(api),
-    }),
-    {} as ElevateInitializePlugins<S, P>
-  );
-
-  return {
-    ...initializedPlugins,
-    ...api,
   };
 };
 

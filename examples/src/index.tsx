@@ -2,7 +2,7 @@ import useAxios from 'axios-hooks';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import createElevation from 'react-elestate';
-import * as axiosPlugin from 'react-elestate/plugins/axios-hooks';
+import { createElevateAxios } from 'react-elestate/plugins/axios-hooks';
 import queryString from 'query-string';
 import axios from 'axios';
 
@@ -12,6 +12,11 @@ interface ElevatedState {
   beers?: readonly { id: number; name: string }[];
 }
 
+const elevationAPI = createElevation<ElevatedState>({
+  count: 0,
+  header: null,
+});
+
 const {
   useElevated,
   useElevate,
@@ -20,11 +25,9 @@ const {
   useElevateOnUpdate,
   useElevateBeforeUnmount,
   useElevateInitialState,
-  useElevateAxios,
-} = createElevation<ElevatedState, typeof axiosPlugin>(
-  { count: 0, header: null },
-  { ...axiosPlugin }
-);
+} = elevationAPI;
+
+const { useElevateAxios } = createElevateAxios(elevationAPI);
 
 const Counter = () => {
   const count = useElevated((state) => state.count, ['count']);
@@ -189,7 +192,7 @@ const useDebouncePromise = <T extends any, A extends readonly any[]>(
 
   return React.useCallback(
     (...args: A) => {
-      return new Promise((resolve) => {
+      return new Promise<T>((resolve) => {
         window.clearTimeout(timeout.current);
 
         timeout.current = window.setTimeout(() => {
@@ -209,6 +212,13 @@ const Beers = () => {
   );
   const debouncedRequest = useDebouncePromise(request, 500);
 
+  const onChangeSearch = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setSearch(event.currentTarget.value);
+    },
+    []
+  );
+
   React.useEffect(() => {
     const query = queryString.stringify({
       // eslint-disable-next-line camelcase
@@ -224,13 +234,6 @@ const Beers = () => {
     });
   }, [debouncedRequest, search]);
 
-  const onChangeSearch = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setSearch(event.currentTarget.value);
-    },
-    []
-  );
-
   return (
     <>
       <input
@@ -243,7 +246,7 @@ const Beers = () => {
       {error && <p>{error.message}</p>}
       {!loading && !error && (
         <ul>
-          {data?.map((beer: any) => (
+          {data?.map((beer) => (
             <li key={beer.id}>{beer.name}</li>
           ))}
         </ul>

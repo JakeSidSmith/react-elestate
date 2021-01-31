@@ -3,50 +3,52 @@ import type { RefetchOptions, ResponseValues } from 'axios-hooks';
 import type { AxiosPromise, AxiosRequestConfig } from 'axios';
 import type { ElevateAPI, ElevateBaseState } from '../types';
 
-const createPlugin = <S extends ElevateBaseState>({
-  useElevate,
-  useElevated,
-}: ElevateAPI<S>): (<
-  K extends keyof S,
-  TResponse extends S[K],
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TError = any
->(
-  key: K,
-  axiosHooksResult: [
-    ResponseValues<TResponse, TError>,
-    (
-      config?: AxiosRequestConfig,
-      options?: RefetchOptions
-    ) => AxiosPromise<TResponse>
-  ]
-) => [
-  ResponseValues<TResponse, TError>,
-  (
-    config?: AxiosRequestConfig,
-    options?: RefetchOptions
-  ) => AxiosPromise<TResponse>
-]) => {
-  const useElevateAxios = <
+export interface ElevateAxiosAPI<S extends ElevateBaseState> {
+  useElevateAxios: <
     K extends keyof S,
-    TResponse extends S[K],
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     TError = any
   >(
     key: K,
     axiosHooksResult: [
-      ResponseValues<TResponse, TError>,
+      ResponseValues<S[K], TError>,
       (
         config?: AxiosRequestConfig,
         options?: RefetchOptions
-      ) => AxiosPromise<TResponse>
+      ) => AxiosPromise<S[K]>
     ]
-  ): [
-    ResponseValues<TResponse, TError>,
+  ) => [
+    ResponseValues<S[K], TError>,
     (
       config?: AxiosRequestConfig,
       options?: RefetchOptions
-    ) => AxiosPromise<TResponse>
+    ) => AxiosPromise<S[K]>
+  ];
+}
+
+const createElevateAxios = <S extends ElevateBaseState>({
+  useElevate,
+  useElevated,
+}: ElevateAPI<S>): ElevateAxiosAPI<S> => {
+  const useElevateAxios = <
+    K extends keyof S,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    TError = any
+  >(
+    key: K,
+    axiosHooksResult: [
+      ResponseValues<S[K], TError>,
+      (
+        config?: AxiosRequestConfig,
+        options?: RefetchOptions
+      ) => AxiosPromise<S[K]>
+    ]
+  ): [
+    ResponseValues<S[K], TError>,
+    (
+      config?: AxiosRequestConfig,
+      options?: RefetchOptions
+    ) => AxiosPromise<S[K]>
   ] => {
     const elevate = useElevate();
     const currentState = useElevated((state) => state[key]);
@@ -78,7 +80,9 @@ const createPlugin = <S extends ElevateBaseState>({
     return [memoResponse, request];
   };
 
-  return useElevateAxios;
+  return { useElevateAxios };
 };
 
-export { createPlugin as useElevateAxios };
+export { createElevateAxios };
+
+export default createElevateAxios;
