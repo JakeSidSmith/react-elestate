@@ -44,6 +44,7 @@ export interface FieldProps<V, E> {
 
 export interface FieldOptions<V, E, P> {
   transformProps?: (props: FieldProps<V, E>) => P;
+  transformValue?: (eventOrValue: E) => V;
 }
 
 export interface EnforcedFieldOptions<V, E, P> extends FieldOptions<V, E, P> {
