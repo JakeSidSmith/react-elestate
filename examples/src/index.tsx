@@ -2,7 +2,7 @@ import useAxios from 'axios-hooks';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import createElevation from 'react-elestate';
-import { createElevateAxios } from 'react-elestate/plugins/axios-hooks';
+import { createElevateAxios } from 'react-elestate/addons/axios-hooks';
 import queryString from 'query-string';
 import axios from 'axios';
 
