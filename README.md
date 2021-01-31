@@ -203,6 +203,8 @@ You'll notice that we don't provide an initial value for our state as we would w
 useElevateOnMount({ count: 0 });
 ```
 
+WARNING: if you are elevating a callback using `useElevateState` you must pass a function that returns the callback, as any functions that are provided are treated as functions that return the new value to be elevated. If you pass the callback itself then it will be immediately called, and instead the callback's return value will be elevated. In many cases your types (if you're using TypeScript) will catch this, but there are cases where your callback's types may match those of your state.
+
 ### useElevateInitialState
 
 What about server side rendering? If we want to provide some initial values for our app we can do so by using the `useElevateInitialState` in our app component.
