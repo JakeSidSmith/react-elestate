@@ -211,7 +211,9 @@ const Form = () => {
   const favoriteColor = useElevateFieldValue('favoriteColor');
   const tellingTheTruth = useElevateFieldChecked('tellingTheTruth');
   const dateString = useElevateFieldValue('dateString');
-  const number = useElevateFieldNumberValue('number', undefined);
+  const number = useElevateFieldNumberValue('number', {
+    valueWhenNaN: undefined,
+  });
   const custom = useElevateFieldCustom('custom');
 
   return (

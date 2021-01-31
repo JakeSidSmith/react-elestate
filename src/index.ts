@@ -68,7 +68,7 @@ export interface ElevateFormInterface<S extends StringKeyedObject> {
   };
   useElevateFieldNumberValue: <F extends keyof PickNumberKeys<S>>(
     fieldName: F,
-    valueWhenNaN: S[F]
+    options: { valueWhenNaN: S[F] }
   ) => {
     value: string;
     onChange: (
@@ -318,7 +318,7 @@ const createElevation = <S extends StringKeyedObject>(
 
     const useElevateFieldNumberValue = <F extends keyof PickNumberKeys<S[K]>>(
       fieldName: F,
-      valueWhenNaN: S[K][F]
+      options: { valueWhenNaN: S[K][F] }
     ) => {
       const elevate = useElevate();
       const numberValue = useElevated((state) => state[key][fieldName]);
@@ -339,11 +339,13 @@ const createElevation = <S extends StringKeyedObject>(
             ...state,
             [key]: {
               ...state[key],
-              [fieldName]: Number.isNaN(nextValue) ? valueWhenNaN : nextValue,
+              [fieldName]: Number.isNaN(nextValue)
+                ? options.valueWhenNaN
+                : nextValue,
             },
           }));
         },
-        [fieldName, elevate, valueWhenNaN]
+        [fieldName, elevate, options.valueWhenNaN]
       );
 
       const props = React.useMemo(
