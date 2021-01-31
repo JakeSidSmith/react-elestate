@@ -5,6 +5,11 @@ import createElevation from 'react-elestate';
 interface ElevatedState {
   count: number;
   header: string | null;
+  form: Partial<{
+    favoriteFood: string;
+    favoriteColor: string;
+    tellingTheTruth: boolean;
+  }>;
 }
 
 const {
@@ -15,7 +20,8 @@ const {
   useElevateOnUpdate,
   useElevateBeforeUnmount,
   useElevateInitialState,
-} = createElevation<ElevatedState>({ count: 0, header: null });
+  useElevateForm,
+} = createElevation<ElevatedState>({ count: 0, header: null, form: {} });
 
 const Counter = () => {
   const count = useElevated((state) => state.count, ['count']);
@@ -159,8 +165,32 @@ const Tabs = () => {
   );
 };
 
+const Form = () => {
+  const { useOnSubmit, useField } = useElevateForm('form');
+  const onSubmit = useOnSubmit((data) => alert(JSON.stringify(data)));
+  const favoriteFood = useField('favoriteFood');
+  const favoriteColor = useField('favoriteColor');
+  const tellingTheTruth = useField('tellingTheTruth', {
+    transformValue: (event: React.ChangeEvent<HTMLInputElement>) =>
+      event.currentTarget.checked,
+    transformProps: ({ value, ...props }) => ({
+      ...props,
+      checked: value,
+    }),
+  });
+
+  return (
+    <form onSubmit={onSubmit}>
+      <input type="text" {...favoriteFood} />
+      <input type="text" {...favoriteColor} />
+      <input type="checkbox" {...tellingTheTruth} />
+      <button type="submit">Submit</button>
+    </form>
+  );
+};
+
 const App = () => {
-  useElevateInitialState({ count: 1, header: null });
+  useElevateInitialState({ count: 1, header: null, form: {} });
 
   return (
     <>
@@ -170,6 +200,7 @@ const App = () => {
       <CounterControl />
       <Header />
       <Tabs />
+      <Form />
     </>
   );
 };

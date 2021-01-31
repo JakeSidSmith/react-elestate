@@ -16,9 +16,64 @@ export type ElevateAction<S extends StringKeyedObject> =
 
 export type ElevateSelector<S extends StringKeyedObject, R> = (state: S) => R;
 
-interface ElevateSubscription<S extends StringKeyedObject> {
+export interface ElevateSubscription<S extends StringKeyedObject> {
   subscribedKeys?: readonly (keyof S)[];
   callback: (nextState: S) => void;
+}
+
+export type ObjectKeys<S extends StringKeyedObject> = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [K in keyof S]: S[K] extends readonly any[]
+    ? never
+    : S[K] extends StringKeyedObject
+    ? K
+    : never;
+} extends { [_K in keyof S]: infer V }
+  ? V
+  : never;
+
+export type PickObjectKeys<S extends StringKeyedObject> = Pick<
+  S,
+  ObjectKeys<S>
+>;
+
+export interface FieldProps<V, E> {
+  value: V;
+  onChange: (eventOrValue: E) => void;
+}
+
+export interface FieldOptions<V, E, P> {
+  transformProps?: (props: FieldProps<V, E>) => P;
+}
+
+export interface EnforcedFieldOptions<V, E, P> extends FieldOptions<V, E, P> {
+  transformValue: (eventOrValue: E) => V;
+}
+
+export type AdditionalFieldArgs<V, E, P> = E extends React.ChangeEvent<
+  HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+>
+  ? string extends V
+    ? [options?: FieldOptions<V, E, P>]
+    : [options: EnforcedFieldOptions<V, E, P>]
+  : E extends V
+  ? [options?: FieldOptions<V, E, P>]
+  : [options: EnforcedFieldOptions<V, E, P>];
+
+export interface ElevateFormInterface<S extends StringKeyedObject> {
+  useOnSubmit: (
+    callback: (data: S, event: React.FormEvent<HTMLFormElement>) => void
+  ) => (event: React.FormEvent<HTMLFormElement>) => void;
+  useField: <
+    F extends keyof S,
+    E = React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+    P = FieldProps<S[F], E>
+  >(
+    fieldName: F,
+    ...args: AdditionalFieldArgs<S[F], E, P>
+  ) => P;
 }
 
 export interface ElevationInterface<S extends StringKeyedObject> {
@@ -28,6 +83,9 @@ export interface ElevationInterface<S extends StringKeyedObject> {
   ) => R;
   useElevate: () => (action: ElevateAction<S>) => void;
   useElevateState: <K extends keyof S>(key: K) => ElevateStateInterface<S[K]>;
+  useElevateForm: <K extends keyof PickObjectKeys<S>>(
+    key: K
+  ) => ElevateFormInterface<PickObjectKeys<S>[K]>;
   useElevateOnMount: (action: ElevateAction<S>) => void;
   useElevateOnUpdate: (action: ElevateAction<S>) => void;
   useElevateBeforeUnmount: (action: ElevateAction<S>) => void;
