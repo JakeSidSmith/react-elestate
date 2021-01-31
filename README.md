@@ -2,6 +2,18 @@
 
 **Elevate your React state for access anywhere**
 
+## Why should you choose elestate?
+
+- 🔍 It's tiny - only about 3KB
+- 0️⃣ Has no dependencies (except React)
+- 🎁 It doesn't require provider/context wrappers
+- ⛅️ It supports server side rendering
+- ✅ It is possibly the most type-safe state solution out there
+- 🏎 It is performant (does **not**: require listening to your entire state, observers, or context)
+- 📝 No boiler-plate?
+- ➕ It has addons for handling request and form state
+- 🕹 Addons for your favorite libraries like [axios-hooks](https://www.npmjs.com/package/axios-hooks) and [formik](https://www.npmjs.com/package/formik)
+
 ## About
 
 A tiny state sharing library (~3KB), with zero dependencies (if you exclude React), built on top of React's existing hooks, with TypeScript in mind.
