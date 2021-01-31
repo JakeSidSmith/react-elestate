@@ -1,8 +1,0 @@
-{
-  "extends": "./tsconfig.dist-shared.json",
-  "compilerOptions": {
-    "outDir": "dist/es",
-    "module": "ES6",
-    "target": "ES5"
-  }
-}
