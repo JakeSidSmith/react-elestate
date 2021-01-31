@@ -9,7 +9,8 @@ interface ElevatedState {
     favoriteFood: string;
     favoriteColor: string;
     tellingTheTruth: boolean;
-    date: Date;
+    dateString: string;
+    custom: number | undefined;
   }>;
 }
 
@@ -21,14 +22,19 @@ const {
   useElevateOnUpdate,
   useElevateBeforeUnmount,
   useElevateInitialState,
-  createElevateForm,
+  createElevationForm,
 } = createElevation<ElevatedState>({
   count: 0,
   header: null,
   favoriteForm: {},
 });
 
-const { useOnSubmit, useField } = createElevateForm('favoriteForm');
+const {
+  useOnSubmit,
+  useElevateFieldValue,
+  useElevateFieldChecked,
+  useElevateFieldCustom,
+} = createElevationForm('favoriteForm');
 
 const Counter = () => {
   const count = useElevated((state) => state.count, ['count']);
@@ -172,52 +178,46 @@ const Tabs = () => {
   );
 };
 
-interface CustomDateInputProps {
-  value: Date | undefined;
-  onChange: (value: Date | undefined) => void;
+interface CustomInputProps {
+  value: number | undefined;
+  onChange: (value: number | undefined) => void;
 }
 
-const CustomDateInput = ({ value, onChange }: CustomDateInputProps) => {
+const CustomInput = ({ value, onChange }: CustomInputProps) => {
   const onChangeWrapper = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      const dateValue = new Date(event.currentTarget.value);
+      if (event.currentTarget.value) {
+        const int = parseInt(event.currentTarget.value, 10);
 
-      onChange(dateValue);
+        if (Number.isFinite(int)) {
+          onChange(int);
+          return;
+        }
+      }
+
+      onChange(undefined);
     },
     [onChange]
   );
 
-  return (
-    <input
-      type="date"
-      value={value?.toISOString()}
-      onChange={onChangeWrapper}
-    />
-  );
+  return <input type="number" value={value ?? ''} onChange={onChangeWrapper} />;
 };
 
 const Form = () => {
   const onSubmit = useOnSubmit((data) => alert(JSON.stringify(data)));
-  const favoriteFood = useField('favoriteFood');
-  const favoriteColor = useField('favoriteColor');
-  const date = useField('date', {
-    transformValue: (value: Date | undefined) => value,
-  });
-  const tellingTheTruth = useField('tellingTheTruth', {
-    transformValue: (event: React.ChangeEvent<HTMLInputElement>) =>
-      event.currentTarget.checked,
-    transformProps: ({ value, ...props }) => ({
-      ...props,
-      checked: value,
-    }),
-  });
+  const favoriteFood = useElevateFieldValue('favoriteFood');
+  const favoriteColor = useElevateFieldValue('favoriteColor');
+  const tellingTheTruth = useElevateFieldChecked('tellingTheTruth');
+  const dateString = useElevateFieldValue('dateString');
+  const custom = useElevateFieldCustom('custom');
 
   return (
     <form onSubmit={onSubmit}>
       <input type="text" {...favoriteFood} />
       <input type="text" {...favoriteColor} />
       <input type="checkbox" {...tellingTheTruth} />
-      <CustomDateInput {...date} />
+      <CustomInput {...custom} />
+      <input type="date" {...dateString} />
       <button type="submit">Submit</button>
     </form>
   );
