@@ -171,7 +171,7 @@ const Tabs = () => {
   );
 };
 
-const API = 'https://api.punkapi.com/v2/beers';
+const BEER_API_ROOT = 'https://api.punkapi.com/v2/beers';
 
 const BeerCount = () => {
   const beerCount = useElevated((state) => state.beers?.length);
@@ -208,7 +208,7 @@ const Beers = () => {
   const [search, setSearch] = React.useState<string>('');
   const [{ data, loading, error }, request] = useElevateAxios(
     'beers',
-    useAxios(API)
+    useAxios(BEER_API_ROOT)
   );
   const debouncedRequest = useDebouncePromise(request, 500);
 
@@ -225,7 +225,7 @@ const Beers = () => {
       beer_name: search || undefined,
     });
     debouncedRequest({
-      url: `${API}${query && '?'}${query}`,
+      url: `${BEER_API_ROOT}${query && '?'}${query}`,
     }).catch((err) => {
       if (!axios.isCancel(err)) {
         // eslint-disable-next-line no-console
