@@ -9,6 +9,7 @@ interface ElevatedState {
     favoriteFood: string;
     favoriteColor: string;
     tellingTheTruth: boolean;
+    date: Date;
   }>;
 }
 
@@ -165,11 +166,38 @@ const Tabs = () => {
   );
 };
 
+interface CustomDateInputProps {
+  value: Date | undefined;
+  onChange: (value: Date | undefined) => void;
+}
+
+const CustomDateInput = ({ value, onChange }: CustomDateInputProps) => {
+  const onChangeWrapper = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const dateValue = new Date(event.currentTarget.value);
+
+      onChange(dateValue);
+    },
+    [onChange]
+  );
+
+  return (
+    <input
+      type="date"
+      value={value?.toISOString()}
+      onChange={onChangeWrapper}
+    />
+  );
+};
+
 const Form = () => {
   const { useOnSubmit, useField } = useElevateForm('form');
   const onSubmit = useOnSubmit((data) => alert(JSON.stringify(data)));
   const favoriteFood = useField('favoriteFood');
   const favoriteColor = useField('favoriteColor');
+  const date = useField('date', {
+    transformValue: (value: Date | undefined) => value,
+  });
   const tellingTheTruth = useField('tellingTheTruth', {
     transformValue: (event: React.ChangeEvent<HTMLInputElement>) =>
       event.currentTarget.checked,
@@ -184,6 +212,7 @@ const Form = () => {
       <input type="text" {...favoriteFood} />
       <input type="text" {...favoriteColor} />
       <input type="checkbox" {...tellingTheTruth} />
+      <CustomDateInput {...date} />
       <button type="submit">Submit</button>
     </form>
   );
