@@ -5,7 +5,7 @@ import createElevation from 'react-elestate';
 interface ElevatedState {
   count: number;
   header: string | null;
-  form: Partial<{
+  favoriteForm: Partial<{
     favoriteFood: string;
     favoriteColor: string;
     tellingTheTruth: boolean;
@@ -21,8 +21,14 @@ const {
   useElevateOnUpdate,
   useElevateBeforeUnmount,
   useElevateInitialState,
-  useElevateForm,
-} = createElevation<ElevatedState>({ count: 0, header: null, form: {} });
+  createElevateForm,
+} = createElevation<ElevatedState>({
+  count: 0,
+  header: null,
+  favoriteForm: {},
+});
+
+const { useOnSubmit, useField } = createElevateForm('favoriteForm');
 
 const Counter = () => {
   const count = useElevated((state) => state.count, ['count']);
@@ -191,7 +197,6 @@ const CustomDateInput = ({ value, onChange }: CustomDateInputProps) => {
 };
 
 const Form = () => {
-  const { useOnSubmit, useField } = useElevateForm('form');
   const onSubmit = useOnSubmit((data) => alert(JSON.stringify(data)));
   const favoriteFood = useField('favoriteFood');
   const favoriteColor = useField('favoriteColor');
@@ -219,7 +224,7 @@ const Form = () => {
 };
 
 const App = () => {
-  useElevateInitialState({ count: 1, header: null, form: {} });
+  useElevateInitialState({ count: 1, header: null, favoriteForm: {} });
 
   return (
     <>

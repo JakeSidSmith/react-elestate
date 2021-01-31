@@ -55,11 +55,11 @@ export type AdditionalFieldArgs<V, E, P> = E extends React.ChangeEvent<
   HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
 >
   ? string extends V
-    ? [options?: FieldOptions<V, E, P>]
-    : [options: EnforcedFieldOptions<V, E, P>]
+    ? [fieldOptions?: FieldOptions<V, E, P>]
+    : [fieldOptions: EnforcedFieldOptions<V, E, P>]
   : E extends V
-  ? [options?: FieldOptions<V, E, P>]
-  : [options: EnforcedFieldOptions<V, E, P>];
+  ? [fieldOptions?: FieldOptions<V, E, P>]
+  : [fieldOptions: EnforcedFieldOptions<V, E, P>];
 
 export interface ElevateFormInterface<S extends StringKeyedObject> {
   useOnSubmit: (
@@ -84,13 +84,13 @@ export interface ElevationInterface<S extends StringKeyedObject> {
   ) => R;
   useElevate: () => (action: ElevateAction<S>) => void;
   useElevateState: <K extends keyof S>(key: K) => ElevateStateInterface<S[K]>;
-  useElevateForm: <K extends keyof PickObjectKeys<S>>(
-    key: K
-  ) => ElevateFormInterface<PickObjectKeys<S>[K]>;
   useElevateOnMount: (action: ElevateAction<S>) => void;
   useElevateOnUpdate: (action: ElevateAction<S>) => void;
   useElevateBeforeUnmount: (action: ElevateAction<S>) => void;
   useElevateInitialState: (initialState: S) => void;
+  createElevateForm: <K extends keyof PickObjectKeys<S>>(
+    key: K
+  ) => ElevateFormInterface<PickObjectKeys<S>[K]>;
 }
 
 const isElevateStateActionFunction = <S>(
@@ -245,6 +245,67 @@ const createElevation = <S extends StringKeyedObject>(
     return [currentState, setState];
   };
 
+  const createElevateForm = <K extends keyof PickObjectKeys<S>>(
+    key: K
+  ): ElevateFormInterface<PickObjectKeys<S>[K]> => {
+    const useOnSubmit = (
+      callback: (
+        data: PickObjectKeys<S>[K],
+        event: React.FormEvent<HTMLFormElement>
+      ) => void
+    ) => {
+      const data = useElevated((state) => state[key]);
+
+      const onSubmit = React.useCallback(
+        (event: React.FormEvent<HTMLFormElement>) => {
+          event.preventDefault();
+
+          callback(data, event);
+        },
+        [callback, data]
+      );
+
+      return onSubmit;
+    };
+
+    const useField = <
+      F extends keyof S[K],
+      E = React.ChangeEvent<
+        HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+      >,
+      P = FieldProps<PickObjectKeys<S>[K][F], E>
+    >(
+      fieldName: F,
+      ...args: AdditionalFieldArgs<PickObjectKeys<S>[K][F], E, P>
+    ): P => {
+      const { transformValue, transformProps } = args[0] ?? {};
+      const elevate = useElevate();
+      const value = useElevated((state) => state[key][fieldName]);
+
+      const onChange = React.useCallback(
+        (event: E) => {
+          elevate((state) => ({
+            ...state,
+            [key]: {
+              ...state[key],
+              [fieldName]: transformValue ? transformValue(event) : event,
+            },
+          }));
+        },
+        [fieldName, elevate, transformValue]
+      );
+
+      const props = {
+        value,
+        onChange,
+      };
+
+      return (transformProps ? transformProps(props) : props) as P;
+    };
+
+    return { useOnSubmit, useField };
+  };
+
   const useElevateOnMount = (action: ElevateAction<S>): void => {
     React.useEffect(() => {
       store.setState(action);
@@ -289,6 +350,7 @@ const createElevation = <S extends StringKeyedObject>(
     useElevateOnUpdate,
     useElevateBeforeUnmount,
     useElevateInitialState,
+    createElevateForm,
   };
 };
 
