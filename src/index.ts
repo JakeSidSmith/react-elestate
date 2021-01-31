@@ -47,11 +47,6 @@ export type PickBooleanKeys<S extends StringKeyedObject> = Pick<
   KeysOfType<S, boolean>
 >;
 
-export interface FieldProps<V, E> {
-  value: V;
-  onChange: (event: E) => void;
-}
-
 export interface ElevateFormInterface<S extends StringKeyedObject> {
   useOnSubmit: (
     callback: (data: S, event: React.FormEvent<HTMLFormElement>) => void
