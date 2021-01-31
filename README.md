@@ -304,5 +304,6 @@ const Timer: FunctionComponent = ({ children }) => {
 
 - Do not mutate elevated state - mutating state may not cause your components to update.
 - Avoid rendering more than one component using any of the [automated elevation hooks](#automatic-elevation) to update a single piece of state at the same time - they may fight over which controls the state and either only the latter component rendered will win, or they will get stuck in an infinite loop.
+- Do not pass a function to `useElevateOnUpdate` that's return value relies on it's current value - that's an infinite loop.
 - Only ever call `useElevateInitialState` once at the very root of your app.
 - Avoid calling `useElevateInitialState` if you just want to provide some default state, this can be provided when [creating your elevation](#createElevation).
