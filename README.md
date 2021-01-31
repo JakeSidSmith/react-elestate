@@ -22,6 +22,31 @@ By default access of elevated state will listen for any changes to the elevated 
 npm i react-elestate -P
 ```
 
+## Super quick overview
+
+```tsx
+// Create an elevation
+const e = createElevation<StateType>(initialValue);
+// Access a value from the elevation
+e.useElevated((state) => state.value);
+// Elevate a value
+const elevate = e.useElevate();
+elevate({ message: 'Hello, World!' });
+// Elevate a value based on the current value
+elevate((state) => ({ count: state.count + 1 }));
+// Both access and control a piece of the state
+const [value, setValue] = e.useElevateState('message');
+// Elevate a value on mount (can also receive a function)
+e.useElevateOnMount({ count: 0 });
+// Set/clear a value on unmount
+e.useElevateBeforeUnmount({ count: null });
+// Continuously elevate a value
+const time = useTime();
+e.useElevateOnUpdate({ time });
+// Set initial values for server side rendering (at the top of your App component)
+e.useElevateInitialState({ count: 1 });
+```
+
 ## Usage
 
 Note: All of these examples will use TypeScript and ES6 (or higher) syntax.
@@ -149,6 +174,36 @@ const App = () => (
 
 export default App;
 ```
+
+### useElevateState
+
+The `useElevateState` hook is wrapper around `useElevate` and `useElevated` with a similar API to `useState`. If we wanted our increment button to both elevate the count and render the current count we can use `useElevateState` to save us writing 2 individual hooks.
+
+Rather than having access to the entire state object, we provide the specific key in the state we wish to control.
+
+```tsx
+import React, { useCallback } from 'react';
+import { useElevate } from './counter-elevation';
+
+const IncrementButton = () => {
+  const [count, setCount] = useElevateState('count');
+  const increment = useCallback(() => {
+    setCount((count) => state.count + 1);
+  }, []);
+
+  return <button onClick={increment}>Increment {count}</button>;
+};
+
+export default IncrementButton;
+```
+
+You'll notice that we don't provide an initial value for our state as we would with a regular `setState`. This is because the API would not be able to tell the difference between an `undefined` initial value, and not wanting to provide an initial value (and instead use the existing elevated value). Instead if you want to set the initial value you can do so with a `useEffect` or `useElevateOnMount` call. e.g.
+
+```tsx
+useElevateOnMount({ count: 0 });
+```
+
+WARNING: if you are elevating a callback using `useElevateState` you must pass a function that returns the callback, as any functions that are provided are treated as functions that return the new value to be elevated. If you pass the callback itself then it will be immediately called, and instead the callback's return value will be elevated. In many cases your types (if you're using TypeScript) will catch this, but there are cases where your callback's types may match those of your state.
 
 ### useElevateInitialState
 
