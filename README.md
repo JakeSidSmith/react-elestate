@@ -150,6 +150,34 @@ const App = () => (
 export default App;
 ```
 
+### useElevateState
+
+The `useElevateState` hook is wrapper around `useElevate` and `useElevated` with a similar API to `useState`. If we wanted our increment button to both elevate the count and render the current count we can use `useElevateState` to save us writing 2 individual hooks.
+
+Rather than having access to the entire state object, we provide the specific key in the state we wish to control.
+
+```tsx
+import React, { useCallback } from 'react';
+import { useElevate } from './counter-elevation';
+
+const IncrementButton = () => {
+  const [count, setCount] = useElevateState('count');
+  const increment = useCallback(() => {
+    setCount((count) => state.count + 1);
+  }, []);
+
+  return <button onClick={increment}>Increment {count}</button>;
+};
+
+export default IncrementButton;
+```
+
+You'll notice that we don't provide an initial value for our state as we would with a regular `setState`. This is because the API would not be able to tell the difference between an `undefined` initial value, and not wanting to provide an initial value (and instead use the existing elevated value). Instead if you want to set the initial value you can do so with a `useEffect` or `useElevateOnMount` call. e.g.
+
+```tsx
+useElevateOnMount({ count: 0 });
+```
+
 ### useElevateInitialState
 
 What about server side rendering? If we want to provide some initial values for our app we can do so by using the `useElevateInitialState` in our app component.
