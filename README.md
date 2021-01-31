@@ -28,12 +28,6 @@ This library does some clever diffing of values behind the scenes so if you try 
 
 By default access of elevated state will listen for any changes to the elevated state, but you can provide a list of keys that you wish to subscribe to (and I recommend doing this) which will result in less re-renders and a more performant app.
 
-## Installation
-
-```shell
-npm i react-elestate -P
-```
-
 ## Super quick overview
 
 ```tsx
@@ -57,6 +51,12 @@ const time = useTime();
 e.useElevateOnUpdate({ time });
 // Set initial values for server side rendering (at the top of your App component)
 e.useElevateInitialState({ count: 1 });
+```
+
+## Installation
+
+```shell
+npm i react-elestate -P
 ```
 
 ## Usage
