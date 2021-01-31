@@ -4,7 +4,7 @@
 
 ## About
 
-A tiny state sharing library (< 3KB), with zero dependencies (if you exclude React), built on top of React's existing hooks, with TypeScript in mind.
+A tiny state sharing library (~3KB), with zero dependencies (if you exclude React), built on top of React's existing hooks, with TypeScript in mind.
 
 This library is intended primarily for use when building apps, not libraries, however, if used correctly, could be utilized for library state management.
 
