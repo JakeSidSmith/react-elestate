@@ -1,11 +1,15 @@
+import useAxios from 'axios-hooks';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import createElevation from 'react-elestate';
 import * as axiosPlugin from 'react-elestate/plugins/axios-hooks';
+import queryString from 'query-string';
+import axios from 'axios';
 
 interface ElevatedState {
   count: number;
   header: string | null;
+  beers?: readonly { id: number; name: string }[];
 }
 
 const {
@@ -19,7 +23,7 @@ const {
   useElevateAxios,
 } = createElevation<ElevatedState, typeof axiosPlugin>(
   { count: 0, header: null },
-  axiosPlugin
+  { ...axiosPlugin }
 );
 
 const Counter = () => {
@@ -164,6 +168,90 @@ const Tabs = () => {
   );
 };
 
+const API = 'https://api.punkapi.com/v2/beers';
+
+const BeerCount = () => {
+  const beerCount = useElevated((state) => state.beers?.length);
+
+  if (typeof beerCount === 'undefined') {
+    return null;
+  }
+
+  return <p>Viewing {beerCount} beers</p>;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const useDebouncePromise = <T extends any, A extends readonly any[]>(
+  callback: (...args: A) => Promise<T>,
+  delay: number
+) => {
+  const timeout = React.useRef<number>();
+
+  return React.useCallback(
+    (...args: A) => {
+      return new Promise((resolve) => {
+        window.clearTimeout(timeout.current);
+
+        timeout.current = window.setTimeout(() => {
+          resolve(callback(...args));
+        }, delay);
+      });
+    },
+    [delay, callback]
+  );
+};
+
+const Beers = () => {
+  const [search, setSearch] = React.useState<string>('');
+  const [{ data, loading, error }, request] = useElevateAxios(
+    'beers',
+    useAxios(API)
+  );
+  const debouncedRequest = useDebouncePromise(request, 500);
+
+  React.useEffect(() => {
+    const query = queryString.stringify({
+      // eslint-disable-next-line camelcase
+      beer_name: search || undefined,
+    });
+    debouncedRequest({
+      url: `${API}${query && '?'}${query}`,
+    }).catch((err) => {
+      if (!axios.isCancel(err)) {
+        // eslint-disable-next-line no-console
+        console.error(err);
+      }
+    });
+  }, [debouncedRequest, search]);
+
+  const onChangeSearch = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setSearch(event.currentTarget.value);
+    },
+    []
+  );
+
+  return (
+    <>
+      <input
+        type="text"
+        placeholder="Search beers..."
+        value={search}
+        onChange={onChangeSearch}
+      />
+      {loading && <p>Loading...</p>}
+      {error && <p>{error.message}</p>}
+      {!loading && !error && (
+        <ul>
+          {data?.map((beer: any) => (
+            <li key={beer.id}>{beer.name}</li>
+          ))}
+        </ul>
+      )}
+    </>
+  );
+};
+
 const App = () => {
   useElevateInitialState({ count: 1, header: null });
 
@@ -175,6 +263,8 @@ const App = () => {
       <CounterControl />
       <Header />
       <Tabs />
+      <BeerCount />
+      <Beers />
     </>
   );
 };
