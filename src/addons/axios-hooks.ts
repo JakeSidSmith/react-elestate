@@ -2,6 +2,7 @@ import * as React from 'react';
 import type { RefetchOptions, ResponseValues } from 'axios-hooks';
 import type { AxiosPromise, AxiosRequestConfig } from 'axios';
 import type { ElevateAPI, ElevateBaseState } from '../types';
+import { useSubsequentEffect } from 'react-elestate/utils';
 
 export type AxiosHooksResult<S, TError> = [
   ResponseValues<S, TError>,
@@ -38,19 +39,14 @@ const createElevateAxios = <S extends ElevateBaseState>({
   ): ElevateAxiosResult<S[K], TError> => {
     const elevate = useElevate();
     const currentState = useElevated((state) => state[key], [key]);
-    const calledOnce = React.useRef(false);
 
     const [response, request] = axiosHooksResult;
 
-    React.useEffect(() => {
-      if (calledOnce.current) {
-        elevate((state) => ({
-          ...state,
-          [key]: response.data,
-        }));
-      }
-
-      calledOnce.current = true;
+    useSubsequentEffect(() => {
+      elevate((state) => ({
+        ...state,
+        [key]: response.data,
+      }));
     }, [response.data, elevate, key]);
 
     const memoResponse = React.useMemo(
