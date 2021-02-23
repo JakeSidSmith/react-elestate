@@ -3,8 +3,8 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import createElevation from 'react-elestate';
 import { createElevateAxios } from 'react-elestate/addons/axios-hooks';
-import queryString from 'query-string';
 import axios from 'axios';
+import { useDebouncePromise, useSeconds, useSubsequentEffect } from './utils';
 
 interface ElevatedState {
   count: number;
@@ -12,7 +12,7 @@ interface ElevatedState {
   beers?: readonly { id: number; name: string }[];
 }
 
-const elevationAPI = createElevation<ElevatedState>({
+const elevation = createElevation<ElevatedState>({
   count: 0,
   header: null,
 });
@@ -25,9 +25,9 @@ const {
   useElevateOnUpdate,
   useElevateBeforeUnmount,
   useElevateInitialState,
-} = elevationAPI;
+} = elevation;
 
-const { useElevateAxios } = createElevateAxios(elevationAPI);
+const { useElevateAxios } = createElevateAxios(elevation);
 
 const Counter = () => {
   const count = useElevated((state) => state.count, ['count']);
@@ -82,25 +82,6 @@ const Header = () => {
   }
 
   return <h1>{title}</h1>;
-};
-
-const useSeconds = () => {
-  const [seconds, setSeconds] = React.useState(0);
-
-  React.useEffect(() => {
-    const callback = () => {
-      setSeconds((secs) => secs + 1);
-    };
-
-    const interval = window.setInterval(callback, 1000);
-
-    return () => {
-      window.clearInterval(interval);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  return seconds;
 };
 
 const Tab1 = () => {
@@ -174,34 +155,13 @@ const Tabs = () => {
 const BEER_API_ROOT = 'https://api.punkapi.com/v2/beers';
 
 const BeerCount = () => {
-  const beerCount = useElevated((state) => state.beers?.length);
+  const beerCount = useElevated((state) => state.beers?.length, ['beers']);
 
   if (typeof beerCount === 'undefined') {
     return null;
   }
 
   return <p>Viewing {beerCount} beers</p>;
-};
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const useDebouncePromise = <T extends any, A extends readonly any[]>(
-  callback: (...args: A) => Promise<T>,
-  delay: number
-) => {
-  const timeout = React.useRef<number>();
-
-  return React.useCallback(
-    (...args: A) => {
-      return new Promise<T>((resolve) => {
-        window.clearTimeout(timeout.current);
-
-        timeout.current = window.setTimeout(() => {
-          resolve(callback(...args));
-        }, delay);
-      });
-    },
-    [delay, callback]
-  );
 };
 
 const Beers = () => {
@@ -219,13 +179,12 @@ const Beers = () => {
     []
   );
 
-  React.useEffect(() => {
-    const query = queryString.stringify({
-      // eslint-disable-next-line camelcase
-      beer_name: search || undefined,
-    });
+  useSubsequentEffect(() => {
     debouncedRequest({
-      url: `${BEER_API_ROOT}${query && '?'}${query}`,
+      params: {
+        // eslint-disable-next-line camelcase
+        beer_name: search || undefined,
+      },
     }).catch((err) => {
       if (!axios.isCancel(err)) {
         // eslint-disable-next-line no-console

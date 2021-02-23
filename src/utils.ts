@@ -1,10 +1,11 @@
+import * as React from 'react';
 import type { ElevateStateAction, ElevateBaseState } from './types';
 
-export const isElevateStateActionFunction = <S>(
+const isElevateStateActionFunction = <S>(
   action: ElevateStateAction<S>
 ): action is (state: S) => S => typeof action === 'function';
 
-export const getDiffKeys = <S extends ElevateBaseState>(
+const getDiffKeys = <S extends ElevateBaseState>(
   state: S,
   nextState: Partial<S>
 ): readonly (keyof S)[] => {
@@ -21,3 +22,21 @@ export const getDiffKeys = <S extends ElevateBaseState>(
     return changed;
   }, []);
 };
+
+const useSubsequentEffect = (
+  callback: React.EffectCallback,
+  deps: React.DependencyList
+): void => {
+  const calledOnce = React.useRef(false);
+
+  React.useEffect(() => {
+    if (calledOnce.current) {
+      callback();
+    }
+
+    calledOnce.current = true;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps);
+};
+
+export { isElevateStateActionFunction, getDiffKeys, useSubsequentEffect };
