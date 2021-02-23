@@ -269,7 +269,10 @@
       "removeEventListener"
     ],
     "react-hooks/rules-of-hooks": 2,
-    "react-hooks/exhaustive-deps": 2
+    "react-hooks/exhaustive-deps": [
+      2,
+      { "additionalHooks": "(useSubsequentEffect)" }
+    ]
   },
   "overrides": [
     {
