@@ -36,7 +36,7 @@ const useSubsequentEffect = (
 
     calledOnce.current = true;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deps]);
+  }, deps);
 };
 
 export { isElevateStateActionFunction, getDiffKeys, useSubsequentEffect };
