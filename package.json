@@ -9,8 +9,9 @@
     "build": "tsb build",
     "prettier": "prettier --write '**/*'",
     "prettier-check": "prettier --check '**/*'",
-    "lint": "eslint '**/*.{ts,tsx,js,jsx}' && npm run prettier-check",
-    "test": "npm run lint",
+    "lint": "eslint '**/*.{ts,tsx,js,jsx}'",
+    "typecheck": "tsc --noEmit --project tsconfig.json",
+    "test": "npm run typecheck && npm run prettier-check && npm run lint",
     "prepublishOnly": "npm test && npm run dist"
   },
   "repository": {
