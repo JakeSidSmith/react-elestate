@@ -155,7 +155,7 @@ const Tabs = () => {
 const BEER_API_ROOT = 'https://api.punkapi.com/v2/beers';
 
 const BeerCount = () => {
-  const beerCount = useElevated((state) => state.beers?.length);
+  const beerCount = useElevated((state) => state.beers?.length, ['beers']);
 
   if (typeof beerCount === 'undefined') {
     return null;
