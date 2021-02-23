@@ -6,15 +6,15 @@ import type {
   ElevateAction,
   ElevateSelector,
   ElevateStateAction,
-  ElevateStateInterface,
-  ElevationInterface,
+  ElevateStateResult,
   ElevateBaseState,
+  ElevateAPI,
 } from './types';
 import { isElevateStateActionFunction } from './utils';
 
 const createElevation = <S extends ElevateBaseState>(
   defaultState: S
-): ElevationInterface<S> => {
+): ElevateAPI<S> => {
   const store = new ElevationStore(defaultState);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -48,7 +48,7 @@ const createElevation = <S extends ElevateBaseState>(
 
   const useElevateState = <K extends keyof S>(
     key: K
-  ): ElevateStateInterface<S[K]> => {
+  ): ElevateStateResult<S[K]> => {
     const elevate = useElevate();
     const currentState = useElevated((state) => state[key], [key]);
 

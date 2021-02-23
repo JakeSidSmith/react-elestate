@@ -3,6 +3,16 @@ import type { RefetchOptions, ResponseValues } from 'axios-hooks';
 import type { AxiosPromise, AxiosRequestConfig } from 'axios';
 import type { ElevateAPI, ElevateBaseState } from '../types';
 
+export type AxiosHooksResult<S, TError> = [
+  ResponseValues<S, TError>,
+  (config?: AxiosRequestConfig, options?: RefetchOptions) => AxiosPromise<S>
+];
+
+export type ElevateAxiosResult<S, TError> = [
+  ResponseValues<S, TError>,
+  (config?: AxiosRequestConfig, options?: RefetchOptions) => AxiosPromise<S>
+];
+
 export interface ElevateAxiosAPI<S extends ElevateBaseState> {
   useElevateAxios: <
     K extends keyof S,
@@ -10,20 +20,8 @@ export interface ElevateAxiosAPI<S extends ElevateBaseState> {
     TError = any
   >(
     key: K,
-    axiosHooksResult: [
-      ResponseValues<S[K], TError>,
-      (
-        config?: AxiosRequestConfig,
-        options?: RefetchOptions
-      ) => AxiosPromise<S[K]>
-    ]
-  ) => [
-    ResponseValues<S[K], TError>,
-    (
-      config?: AxiosRequestConfig,
-      options?: RefetchOptions
-    ) => AxiosPromise<S[K]>
-  ];
+    axiosHooksResult: AxiosHooksResult<S[K], TError>
+  ) => ElevateAxiosResult<S[K], TError>;
 }
 
 const createElevateAxios = <S extends ElevateBaseState>({
@@ -36,20 +34,8 @@ const createElevateAxios = <S extends ElevateBaseState>({
     TError = any
   >(
     key: K,
-    axiosHooksResult: [
-      ResponseValues<S[K], TError>,
-      (
-        config?: AxiosRequestConfig,
-        options?: RefetchOptions
-      ) => AxiosPromise<S[K]>
-    ]
-  ): [
-    ResponseValues<S[K], TError>,
-    (
-      config?: AxiosRequestConfig,
-      options?: RefetchOptions
-    ) => AxiosPromise<S[K]>
-  ] => {
+    axiosHooksResult: AxiosHooksResult<S[K], TError>
+  ): ElevateAxiosResult<S[K], TError> => {
     const elevate = useElevate();
     const currentState = useElevated((state) => state[key]);
     const fired = React.useRef(false);
