@@ -12,7 +12,7 @@
 - 🏎 It is performant (does **not**: require listening to your entire state, observers, or context)
 - 📝 No boiler-plate?
 - ➕ It has addons for handling request and form state
-- 🕹 Addons for your favorite libraries like [axios-hooks](https://www.npmjs.com/package/axios-hooks) and [formik](https://www.npmjs.com/package/formik)
+- 🕹 Addons for your favorite libraries like [axios-hooks](https://www.npmjs.com/package/axios-hooks)
 
 ## About
 
