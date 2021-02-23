@@ -38,19 +38,19 @@ const createElevateAxios = <S extends ElevateBaseState>({
   ): ElevateAxiosResult<S[K], TError> => {
     const elevate = useElevate();
     const currentState = useElevated((state) => state[key]);
-    const fired = React.useRef(false);
+    const calledOnce = React.useRef(false);
 
     const [response, request] = axiosHooksResult;
 
     React.useEffect(() => {
-      if (fired.current) {
+      if (calledOnce.current) {
         elevate((state) => ({
           ...state,
           [key]: response.data,
         }));
       }
 
-      fired.current = true;
+      calledOnce.current = true;
     }, [response.data, elevate, key]);
 
     const memoResponse = React.useMemo(
