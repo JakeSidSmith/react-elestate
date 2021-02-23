@@ -6,7 +6,10 @@
     "declaration": true,
     "sourceMap": true,
     "esModuleInterop": false,
-    "allowSyntheticDefaultImports": false
+    "allowSyntheticDefaultImports": false,
+    "outDir": "dist",
+    "module": "CommonJS",
+    "target": "ES5"
   },
   "include": ["src"]
 }

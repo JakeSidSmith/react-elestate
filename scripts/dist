@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+echo 'Clearing dist'
+rm -rf dist
+echo 'Creating dist'
+mkdir -p dist
+echo 'Copying package.json'
+cp package.json dist/package.json
+echo Transpiling TypeScript
+tsc --project tsconfig.dist.json
+
+echo 'Compressing files'
+for file_path in $(find dist -type f -name '*.js'); do
+  file_name=$(basename $file_path)
+  source_map_path=$file_path.map
+  source_map_name=$(basename $source_map_path)
+
+  terser $file_path --output $file_path --compress --mangle --source-map "content='$source_map_path',filename='$source_map_name',url='$source_map_name'"
+
+  echo "Compressed $file_path"
+done
