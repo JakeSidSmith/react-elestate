@@ -12,7 +12,7 @@ interface ElevatedState {
   beers?: readonly { id: number; name: string }[];
 }
 
-const elevationAPI = createElevation<ElevatedState>({
+const elevation = createElevation<ElevatedState>({
   count: 0,
   header: null,
 });
@@ -25,9 +25,9 @@ const {
   useElevateOnUpdate,
   useElevateBeforeUnmount,
   useElevateInitialState,
-} = elevationAPI;
+} = elevation;
 
-const { useElevateAxios } = createElevateAxios(elevationAPI);
+const { useElevateAxios } = createElevateAxios(elevation);
 
 const Counter = () => {
   const count = useElevated((state) => state.count, ['count']);
