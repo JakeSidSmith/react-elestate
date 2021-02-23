@@ -4,14 +4,22 @@ import type { AxiosPromise, AxiosRequestConfig } from 'axios';
 import type { ElevateAPI, ElevateBaseState } from '../types';
 import { useSubsequentEffect } from 'react-elestate/utils';
 
-export type AxiosHooksResult<S, TError> = [
-  ResponseValues<S, TError>,
-  (config?: AxiosRequestConfig, options?: RefetchOptions) => AxiosPromise<S>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type AxiosHooksResult<TResponse = any, TError = any> = [
+  ResponseValues<TResponse, TError>,
+  (
+    config?: AxiosRequestConfig,
+    options?: RefetchOptions
+  ) => AxiosPromise<TResponse>
 ];
 
-export type ElevateAxiosResult<S, TError> = [
-  ResponseValues<S, TError>,
-  (config?: AxiosRequestConfig, options?: RefetchOptions) => AxiosPromise<S>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ElevateAxiosResult<TResponse = any, TError = any> = [
+  ResponseValues<TResponse, TError>,
+  (
+    config?: AxiosRequestConfig,
+    options?: RefetchOptions
+  ) => AxiosPromise<TResponse>
 ];
 
 export interface ElevateAxiosAPI<S extends ElevateBaseState> {
