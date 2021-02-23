@@ -1,6 +1,7 @@
 /dist/*
 /examples/build/*
 /.vscode/*
+/scripts/*
 **/*.txt
 
 .eslintignore
@@ -8,3 +9,4 @@
 .gitignore
 .gitattributes
 .npmignore
+.nvmrc

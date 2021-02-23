@@ -2,9 +2,21 @@
 
 **Elevate your React state for access anywhere**
 
+## Why should you choose elestate?
+
+- 🔍 It's tiny - only about 3KB
+- 0️⃣ Has no dependencies (except React)
+- 🎁 It doesn't require provider/context wrappers
+- ⛅️ It supports server side rendering
+- ✅ It is possibly the most type-safe state solution out there
+- 🏎 It is performant (does **not**: require listening to your entire state, observers, or context)
+- 📝 No boiler-plate?
+- ➕ It has addons for handling request and form state
+- 🕹 Addons for your favorite libraries like [axios-hooks](https://www.npmjs.com/package/axios-hooks)
+
 ## About
 
-A tiny state sharing library (< 3KB), with zero dependencies (if you exclude React), built on top of React's existing hooks, with TypeScript in mind.
+A tiny state sharing library (~3KB), with zero dependencies (if you exclude React), built on top of React's existing hooks, with TypeScript in mind.
 
 This library is intended primarily for use when building apps, not libraries, however, if used correctly, could be utilized for library state management.
 
@@ -15,12 +27,6 @@ Additionally, although you may want to create a single elevation for your entire
 This library does some clever diffing of values behind the scenes so if you try to elevate the same state twice your components will not update. This is handled by a shallow comparison on the elevation's values. As a result you should not mutate any state from the elevation as it may not cause your components to update.
 
 By default access of elevated state will listen for any changes to the elevated state, but you can provide a list of keys that you wish to subscribe to (and I recommend doing this) which will result in less re-renders and a more performant app.
-
-## Installation
-
-```shell
-npm i react-elestate -P
-```
 
 ## Super quick overview
 
@@ -45,6 +51,12 @@ const time = useTime();
 e.useElevateOnUpdate({ time });
 // Set initial values for server side rendering (at the top of your App component)
 e.useElevateInitialState({ count: 1 });
+```
+
+## Installation
+
+```shell
+npm i react-elestate -P
 ```
 
 ## Usage
@@ -304,5 +316,7 @@ const Timer: FunctionComponent = ({ children }) => {
 
 - Do not mutate elevated state - mutating state may not cause your components to update.
 - Avoid rendering more than one component using any of the [automated elevation hooks](#automatic-elevation) to update a single piece of state at the same time - they may fight over which controls the state and either only the latter component rendered will win, or they will get stuck in an infinite loop.
+- Do not pass a function to `useElevateOnUpdate` that's return value relies on it's current value - that's an infinite loop.
+- Do not pass a callback that you wish to elevate directly to `useElevateState`. Instead pass a function that returns the callback. If you pass a callback you wish to elevate it will be called and the return value elevated.
 - Only ever call `useElevateInitialState` once at the very root of your app.
 - Avoid calling `useElevateInitialState` if you just want to provide some default state, this can be provided when [creating your elevation](#createElevation).

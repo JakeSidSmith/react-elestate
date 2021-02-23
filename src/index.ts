@@ -1,137 +1,18 @@
 import * as React from 'react';
+import { ElevationStore } from './store';
+export * from './types';
+// eslint-disable-next-line no-duplicate-imports
+import type {
+  ElevateAction,
+  ElevateSelector,
+  ElevateStateAction,
+  ElevateStateInterface,
+  ElevationInterface,
+  ElevateBaseState,
+} from './types';
+import { isElevateStateActionFunction } from './utils';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type StringKeyedObject = Record<string, any>;
-
-export type ElevateStateAction<S> = S | ((state: S) => S);
-
-export type ElevateStateInterface<S> = [
-  S,
-  (action: ElevateStateAction<S>) => void
-];
-
-export type ElevateAction<S extends StringKeyedObject> =
-  | Partial<S>
-  | ((state: S) => Partial<S>);
-
-export type ElevateSelector<S extends StringKeyedObject, R> = (state: S) => R;
-
-interface ElevateSubscription<S extends StringKeyedObject> {
-  subscribedKeys?: readonly (keyof S)[];
-  callback: (nextState: S) => void;
-}
-
-export interface ElevationInterface<S extends StringKeyedObject> {
-  useElevated: <R>(
-    selector: ElevateSelector<S, R>,
-    subscribedKeys?: readonly (keyof S)[]
-  ) => R;
-  useElevate: () => (action: ElevateAction<S>) => void;
-  useElevateState: <K extends keyof S>(key: K) => ElevateStateInterface<S[K]>;
-  useElevateOnMount: (action: ElevateAction<S>) => void;
-  useElevateOnUpdate: (action: ElevateAction<S>) => void;
-  useElevateBeforeUnmount: (action: ElevateAction<S>) => void;
-  useElevateInitialState: (initialState: S) => void;
-}
-
-const isElevateStateActionFunction = <S>(
-  action: ElevateStateAction<S>
-): action is (state: S) => S => typeof action === 'function';
-
-const getDiffKeys = <S extends StringKeyedObject>(
-  state: S,
-  nextState: Partial<S>
-) => {
-  const keys: readonly (keyof S)[] = [
-    ...Object.keys(state),
-    ...Object.keys(nextState),
-  ];
-
-  return keys.reduce<readonly (keyof S)[]>((changed, key) => {
-    if (nextState[key] !== state[key] && !changed.includes(key)) {
-      return [...changed, key];
-    }
-
-    return changed;
-  }, []);
-};
-
-class ElevationStore<S extends StringKeyedObject> {
-  private state: S;
-  private subscriptions: ElevateSubscription<S>[] = [];
-
-  public constructor(state: S) {
-    this.state = state;
-  }
-
-  public getState() {
-    return this.state;
-  }
-
-  public setState(action: ElevateAction<S>, emit = true) {
-    const nextState = {
-      ...this.state,
-      ...(typeof action === 'function' ? action(this.state) : action),
-    };
-    const changedKeys = getDiffKeys(nextState, this.state);
-
-    if (!changedKeys.length) {
-      return;
-    }
-
-    this.state = nextState;
-
-    if (emit) {
-      this.emit(changedKeys);
-    }
-  }
-
-  public emit(changedKeys: readonly (keyof S)[]) {
-    this.subscriptions.forEach(({ subscribedKeys, callback }) => {
-      if (!subscribedKeys) {
-        callback(this.state);
-      } else if (subscribedKeys.length) {
-        const anyChanged = subscribedKeys.some((key) =>
-          changedKeys.includes(key)
-        );
-
-        if (anyChanged) {
-          callback(this.state);
-        }
-      }
-    });
-  }
-
-  public subscribe(
-    subscribedKeys: readonly (keyof S)[] | undefined,
-    callback: (nextState: S) => void
-  ) {
-    if (
-      !this.subscriptions.find(
-        (subscription) => subscription.callback === callback
-      )
-    ) {
-      this.subscriptions.push({
-        subscribedKeys,
-        callback,
-      });
-    }
-
-    const unsubscribe = () => {
-      const index = this.subscriptions.findIndex(
-        (subscription) => subscription.callback === callback
-      );
-
-      if (index >= 0) {
-        this.subscriptions.splice(index, 1);
-      }
-    };
-
-    return unsubscribe;
-  }
-}
-
-const createElevation = <S extends StringKeyedObject>(
+const createElevation = <S extends ElevateBaseState>(
   defaultState: S
 ): ElevationInterface<S> => {
   const store = new ElevationStore(defaultState);
@@ -173,10 +54,10 @@ const createElevation = <S extends StringKeyedObject>(
 
     const setState = React.useCallback(
       (action: ElevateStateAction<S[K]>) => {
-        elevate((previousState) => ({
-          ...previousState,
+        elevate((state) => ({
+          ...state,
           [key]: isElevateStateActionFunction(action)
-            ? action(previousState[key])
+            ? action(state[key])
             : action,
         }));
       },
@@ -223,6 +104,7 @@ const createElevation = <S extends StringKeyedObject>(
   };
 
   return {
+    store,
     useElevated,
     useElevate,
     useElevateState,

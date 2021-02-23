@@ -1,8 +1,0 @@
-{
-  "extends": "./tsconfig.dist-shared.json",
-  "compilerOptions": {
-    "outDir": "dist/cjs",
-    "module": "CommonJS",
-    "target": "ES5"
-  }
-}
