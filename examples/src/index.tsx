@@ -4,6 +4,7 @@ import * as ReactDOM from 'react-dom';
 import createElevation from 'react-elestate';
 import { createElevateAxios } from 'react-elestate/addons/axios-hooks';
 import axios from 'axios';
+import { useDebouncePromise, useSeconds } from './utils';
 
 interface ElevatedState {
   count: number;
@@ -81,25 +82,6 @@ const Header = () => {
   }
 
   return <h1>{title}</h1>;
-};
-
-const useSeconds = () => {
-  const [seconds, setSeconds] = React.useState(0);
-
-  React.useEffect(() => {
-    const callback = () => {
-      setSeconds((secs) => secs + 1);
-    };
-
-    const interval = window.setInterval(callback, 1000);
-
-    return () => {
-      window.clearInterval(interval);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  return seconds;
 };
 
 const Tab1 = () => {
@@ -180,27 +162,6 @@ const BeerCount = () => {
   }
 
   return <p>Viewing {beerCount} beers</p>;
-};
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const useDebouncePromise = <T extends any, A extends readonly any[]>(
-  callback: (...args: A) => Promise<T>,
-  delay: number
-) => {
-  const timeout = React.useRef<number>();
-
-  return React.useCallback(
-    (...args: A) => {
-      return new Promise<T>((resolve) => {
-        window.clearTimeout(timeout.current);
-
-        timeout.current = window.setTimeout(() => {
-          resolve(callback(...args));
-        }, delay);
-      });
-    },
-    [delay, callback]
-  );
 };
 
 const Beers = () => {
