@@ -40,4 +40,20 @@ const useDebouncePromise = <T extends any, A extends readonly any[]>(
   );
 };
 
-export { useSeconds, useDebouncePromise };
+const useSubsequentEffect = (
+  callback: React.EffectCallback,
+  deps: React.DependencyList
+): void => {
+  const calledOnce = React.useRef(false);
+
+  React.useEffect(() => {
+    if (calledOnce.current) {
+      callback();
+    }
+
+    calledOnce.current = true;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps);
+};
+
+export { useSeconds, useDebouncePromise, useSubsequentEffect };

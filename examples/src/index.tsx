@@ -4,7 +4,7 @@ import * as ReactDOM from 'react-dom';
 import createElevation from 'react-elestate';
 import { createElevateAxios } from 'react-elestate/addons/axios-hooks';
 import axios from 'axios';
-import { useDebouncePromise, useSeconds } from './utils';
+import { useDebouncePromise, useSeconds, useSubsequentEffect } from './utils';
 
 interface ElevatedState {
   count: number;
@@ -166,7 +166,6 @@ const BeerCount = () => {
 
 const Beers = () => {
   const [search, setSearch] = React.useState<string>('');
-  const calledOnce = React.useRef(false);
   const [{ data, loading, error }, request] = useElevateAxios(
     'beers',
     useAxios(BEER_API_ROOT)
@@ -180,22 +179,18 @@ const Beers = () => {
     []
   );
 
-  React.useEffect(() => {
-    if (calledOnce.current) {
-      debouncedRequest({
-        params: {
-          // eslint-disable-next-line camelcase
-          beer_name: search || undefined,
-        },
-      }).catch((err) => {
-        if (!axios.isCancel(err)) {
-          // eslint-disable-next-line no-console
-          console.error(err);
-        }
-      });
-    }
-
-    calledOnce.current = true;
+  useSubsequentEffect(() => {
+    debouncedRequest({
+      params: {
+        // eslint-disable-next-line camelcase
+        beer_name: search || undefined,
+      },
+    }).catch((err) => {
+      if (!axios.isCancel(err)) {
+        // eslint-disable-next-line no-console
+        console.error(err);
+      }
+    });
   }, [debouncedRequest, search]);
 
   return (
