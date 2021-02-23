@@ -205,6 +205,7 @@ const useDebouncePromise = <T extends any, A extends readonly any[]>(
 
 const Beers = () => {
   const [search, setSearch] = React.useState<string>('');
+  const calledOnce = React.useRef(false);
   const [{ data, loading, error }, request] = useElevateAxios(
     'beers',
     useAxios(BEER_API_ROOT)
@@ -219,17 +220,21 @@ const Beers = () => {
   );
 
   React.useEffect(() => {
-    debouncedRequest({
-      params: {
-        // eslint-disable-next-line camelcase
-        beer_name: search || undefined,
-      },
-    }).catch((err) => {
-      if (!axios.isCancel(err)) {
-        // eslint-disable-next-line no-console
-        console.error(err);
-      }
-    });
+    if (calledOnce.current) {
+      debouncedRequest({
+        params: {
+          // eslint-disable-next-line camelcase
+          beer_name: search || undefined,
+        },
+      }).catch((err) => {
+        if (!axios.isCancel(err)) {
+          // eslint-disable-next-line no-console
+          console.error(err);
+        }
+      });
+    }
+
+    calledOnce.current = true;
   }, [debouncedRequest, search]);
 
   return (
