@@ -3,7 +3,6 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import createElevation from 'react-elestate';
 import { createElevateAxios } from 'react-elestate/addons/axios-hooks';
-import queryString from 'query-string';
 import axios from 'axios';
 
 interface ElevatedState {
@@ -220,12 +219,11 @@ const Beers = () => {
   );
 
   React.useEffect(() => {
-    const query = queryString.stringify({
-      // eslint-disable-next-line camelcase
-      beer_name: search || undefined,
-    });
     debouncedRequest({
-      url: `${BEER_API_ROOT}${query && '?'}${query}`,
+      params: {
+        // eslint-disable-next-line camelcase
+        beer_name: search || undefined,
+      },
     }).catch((err) => {
       if (!axios.isCancel(err)) {
         // eslint-disable-next-line no-console
